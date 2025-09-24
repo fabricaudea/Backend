@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,6 +23,9 @@ public class DataInitializer implements CommandLineRunner {
     
     @Autowired
     private RoleRepository roleRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @Override
     public void run(String... args) throws Exception {
@@ -54,7 +58,7 @@ public class DataInitializer implements CommandLineRunner {
         if (existingUser.isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword("admin123"); // En producción usar BCrypt
+            admin.setPassword(passwordEncoder.encode("admin123")); // Contraseña encriptada
             admin.setEnabled(true);
             
             // Add ADMIN role
@@ -64,7 +68,7 @@ public class DataInitializer implements CommandLineRunner {
             }
             
             userRepository.save(admin);
-            logger.info("Created admin user");
+            logger.info("Created admin user with encrypted password");
         } else {
             logger.info("Admin user already exists");
         }
