@@ -47,6 +47,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Endpoints públicos - no requieren autenticación
                 .requestMatchers("/api/auth/login", "/api/health/**", "/api/test/**").permitAll()
+                // Endpoints de vehículos - requieren autenticación con roles específicos
+                .requestMatchers("/api/vehicles/**").hasAnyRole("ADMIN", "USER")
                 // Endpoints que requieren roles específicos
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
