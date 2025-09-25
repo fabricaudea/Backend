@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Truck, Shield, BarChart3, Settings, AlertTriangle } from 'lucide-react';
+import { LogOut, User, Truck, Shield, BarChart3, Settings, AlertTriangle, Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -25,6 +25,7 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (!user) return null;
 
@@ -32,8 +33,20 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   return (
     <div className="flex min-h-screen w-full bg-background">
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
+      <div className={`
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border flex flex-col
+        transform transition-transform duration-300 ease-in-out lg:transform-none
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         {/* User Profile Section */}
         <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center space-x-3">
@@ -96,21 +109,45 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="bg-card border-b border-border px-6 py-4">
+        <header className="bg-card border-b border-border px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              {/* Mobile menu button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden text-card-foreground hover:bg-muted p-2"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Abrir menú</span>
+              </Button>
+
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-primary-foreground" />
               </div>
-              <h1 className="text-xl font-bold text-card-foreground">FleetGuard360</h1>
+              <h1 className="text-lg lg:text-xl font-bold text-card-foreground">FleetGuard360</h1>
+            </div>
+
+            {/* Mobile user info */}
+            <div className="lg:hidden">
+              <Badge 
+                variant={user?.role === 'administrador' ? 'default' : 'secondary'}
+                className={user?.role === 'administrador' 
+                  ? 'bg-primary text-primary-foreground text-xs' 
+                  : 'bg-secondary text-secondary-foreground text-xs'
+                }
+              >
+                {user?.role === 'administrador' ? 'Admin' : 'Op'}
+              </Badge>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 bg-background">
+        <main className="flex-1 p-4 lg:p-6 bg-background overflow-x-hidden">
           {children}
         </main>
       </div>

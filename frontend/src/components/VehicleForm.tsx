@@ -97,7 +97,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-card border-border">
+      <DialogContent className="sm:max-w-md w-full max-h-[90vh] overflow-y-auto bg-card border-border mx-4 sm:mx-auto">
         <DialogHeader>
           <DialogTitle className="text-card-foreground">
             {mode === 'create' ? 'Dar de alta vehículo' : 'Editar vehículo'}
@@ -179,20 +179,20 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
             </Select>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="border-border text-card-foreground hover:bg-muted"
+              className="w-full sm:w-auto border-border text-card-foreground hover:bg-muted"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-success text-success-foreground hover:bg-success/90"
+              className="w-full sm:w-auto bg-success text-success-foreground hover:bg-success/90"
             >
               {isLoading 
                 ? 'Procesando...' 
