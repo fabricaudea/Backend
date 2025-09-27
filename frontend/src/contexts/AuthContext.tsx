@@ -1,29 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthContextType, LoginCredentials, User } from '@/types/vehicle';
+import { apiService } from '@/services/api';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Mock users for demonstration
-const mockUsers: { [key: string]: { password: string; user: User } } = {
-  admin: {
-    password: 'admin123',
-    user: {
-      id: '1',
-      username: 'admin',
-      role: 'administrador',
-      name: 'Administrador FleetGuard'
-    }
-  },
-  operador: {
-    password: 'op123',
-    user: {
-      id: '2',
-      username: 'operador',
-      role: 'operador',
-      name: 'Operador de Flota'
-    }
-  }
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -45,23 +24,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const mockUser = mockUsers[credentials.username];
-    
-    if (mockUser && mockUser.password === credentials.password) {
-      setUser(mockUser.user);
-      localStorage.setItem('fleetguard_user', JSON.stringify(mockUser.user));
+    try {
+      console.log('Attempting login with:', credentials.username);
+      const userData = await apiService.login(credentials);
+      console.log('Login successful, user data:', userData);
+      setUser(userData);
+      localStorage.setItem('fleetguard_user', JSON.stringify(userData));
       setIsLoading(false);
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      setIsLoading(false);
+      return false;
     }
-    
-    setIsLoading(false);
-    return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
     setUser(null);
     localStorage.removeItem('fleetguard_user');
   };

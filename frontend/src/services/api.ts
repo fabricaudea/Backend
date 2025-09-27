@@ -12,14 +12,28 @@ class ApiService {
       ...options,
     };
 
-    const response = await fetch(url, defaultOptions);
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Error desconocido' }));
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
-    }
+    try {
+      console.log('Making request to:', url, defaultOptions);
+      
+      const response = await fetch(url, defaultOptions);
+      
+      console.log('Response received:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ 
+          message: `HTTP error! status: ${response.status}` 
+        }));
+        console.error('API Error:', error);
+        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      }
 
-    return response.json();
+      const data = await response.json();
+      console.log('Response data:', data);
+      return data;
+    } catch (fetchError) {
+      console.error('Fetch Error:', fetchError);
+      throw fetchError;
+    }
   }
 
   // Autenticación
@@ -42,7 +56,10 @@ class ApiService {
 
   // Vehículos
   async getVehicles() {
-    return this.request('/vehicles');
+    console.log('🌐 ApiService: Making request to get vehicles...');
+    const result = await this.request('/vehicles');
+    console.log('🌐 ApiService: Vehicle response received:', result);
+    return result;
   }
 
   async getVehicle(id: string) {

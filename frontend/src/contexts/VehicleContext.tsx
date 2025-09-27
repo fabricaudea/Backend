@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Vehicle, VehicleFormData } from '@/types/vehicle';
 import { toast } from '@/hooks/use-toast';
+import { apiService } from '@/services/api';
 
 interface VehicleContextType {
   vehicles: Vehicle[];
@@ -15,53 +16,49 @@ interface VehicleContextType {
 
 const VehicleContext = createContext<VehicleContextType | undefined>(undefined);
 
-// Mock data
-const mockVehicles: Vehicle[] = [
-  {
-    id: '1',
-    placa: 'ABC-123',
-    modelo: 'Mercedes Sprinter 2023',
-    capacidad: 12,
-    estado: 'activo',
-    fechaCreacion: '2024-01-15',
-    fechaActualizacion: '2024-01-15',
-    viajesActivos: 0
-  },
-  {
-    id: '2',
-    placa: 'DEF-456',
-    modelo: 'Ford Transit 2022',
-    capacidad: 8,
-    estado: 'mantenimiento',
-    fechaCreacion: '2024-02-20',
-    fechaActualizacion: '2024-03-10',
-    viajesActivos: 0
-  },
-  {
-    id: '3',
-    placa: 'GHI-789',
-    modelo: 'Iveco Daily 2023',
-    capacidad: 15,
-    estado: 'activo',
-    fechaCreacion: '2024-03-05',
-    fechaActualizacion: '2024-03-05',
-    viajesActivos: 2
-  }
-];
-
 export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateId = () => Math.random().toString(36).substr(2, 9);
+  // Cargar vehículos al iniciar
+  useEffect(() => {
+    console.log('🚀 VehicleContext: Initial load triggered');
+    // Clear any potential cached state
+    setVehicles([]);
+    setError(null);
+    refreshVehicles();
+  }, []);
 
   const refreshVehicles = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      console.log('🔄 VehicleContext: Starting to fetch vehicles...');
+      const vehiclesData = await apiService.getVehicles();
+      console.log('✅ VehicleContext: Received vehicles data:', vehiclesData);
+      console.log('📊 VehicleContext: Vehicle count:', vehiclesData?.length || 0);
+      
+      // Log each vehicle for debugging
+      if (vehiclesData && Array.isArray(vehiclesData)) {
+        vehiclesData.forEach((vehicle, index) => {
+          console.log(`🚗 Vehicle ${index + 1}:`, {
+            id: vehicle.id,
+            placa: vehicle.placa,
+            modelo: vehicle.modelo,
+            estado: vehicle.estado
+          });
+        });
+      }
+      
+      setVehicles(vehiclesData);
+      console.log('💾 VehicleContext: State updated with vehicles');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar vehículos';
+      setError(errorMessage);
+      console.error('❌ VehicleContext: Error loading vehicles:', error);
+    }
     
     setIsLoading(false);
   }, []);
@@ -71,30 +68,7 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setError(null);
 
     try {
-      // Check for duplicate placa
-      const existingVehicle = vehicles.find(v => v.placa.toLowerCase() === data.placa.toLowerCase());
-      if (existingVehicle) {
-        toast({
-          title: "Error",
-          description: "Ya existe un vehículo con esta placa",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return false;
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const newVehicle: Vehicle = {
-        id: generateId(),
-        ...data,
-        placa: data.placa.toUpperCase(),
-        fechaCreacion: new Date().toISOString().split('T')[0],
-        fechaActualizacion: new Date().toISOString().split('T')[0],
-        viajesActivos: 0
-      };
-
+      const newVehicle = await apiService.createVehicle(data);
       setVehicles(prev => [newVehicle, ...prev]);
       
       toast({
@@ -106,33 +80,27 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError('Error al crear vehículo');
+      const errorMessage = error instanceof Error ? error.message : 'Error al crear vehículo';
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "Error al registrar vehículo",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsLoading(false);
       return false;
     }
-  }, [vehicles]);
+  }, []);
 
   const updateVehicle = useCallback(async (id: string, data: Partial<VehicleFormData>): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
+      const updatedVehicle = await apiService.updateVehicle(id, data as VehicleFormData);
+      
       setVehicles(prev => prev.map(vehicle => 
-        vehicle.id === id 
-          ? { 
-              ...vehicle, 
-              ...data,
-              fechaActualizacion: new Date().toISOString().split('T')[0]
-            }
-          : vehicle
+        vehicle.id === id ? updatedVehicle : vehicle
       ));
 
       toast({
@@ -144,10 +112,11 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError('Error al actualizar vehículo');
+      const errorMessage = error instanceof Error ? error.message : 'Error al actualizar vehículo';
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "Error al actualizar vehículo",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsLoading(false);
@@ -172,9 +141,7 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return false;
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
+      await apiService.deleteVehicle(id);
       setVehicles(prev => prev.filter(vehicle => vehicle.id !== id));
 
       toast({
@@ -186,10 +153,11 @@ export const VehicleProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError('Error al eliminar vehículo');
+      const errorMessage = error instanceof Error ? error.message : 'Error al eliminar vehículo';
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "No se pudo eliminar",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsLoading(false);
