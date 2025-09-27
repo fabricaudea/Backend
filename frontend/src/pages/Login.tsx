@@ -163,7 +163,7 @@ export const Login: React.FC = () => {
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium">Credenciales de prueba:</p>
             <p>• Usuario: <code className="bg-muted px-1 rounded">admin</code> / Contraseña: <code className="bg-muted px-1 rounded">admin123</code></p>
-            <p>• Usuario: <code className="bg-muted px-1 rounded">operador</code> / Contraseña: <code className="bg-muted px-1 rounded">op123</code></p>
+            <p>• Usuario: <code className="bg-muted px-1 rounded">operador</code> / Contraseña: <code className="bg-muted px-1 rounded">operador123</code></p>
           </div>
         </div>
       </Card>
