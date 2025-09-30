@@ -32,3 +32,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Java / Maven
+backend/target/
+
+# SO
+.DS_Store
+Thumbs.db
