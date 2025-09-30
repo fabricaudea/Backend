@@ -1,3 +1,5 @@
+# Java / Maven
+backend/target/
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -25,7 +27,7 @@ target/
 /nbbuild/
 /dist/
 /nbdist/
-/.nb-gradle/
+/nb-gradle/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -33,14 +35,10 @@ build/
 ### VS Code ###
 .vscode/
 
-
 # Node
 node_modules/
 frontend/dist/
 frontend/.vite/
-
-# Java / Maven
-backend/target/
 
 # SO
 .DS_Store
