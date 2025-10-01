@@ -10,6 +10,22 @@ import { ConfirmDialog } from './ConfirmDialog';
 import { useVehicles } from '@/contexts/VehicleContext';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Función para formatear placas para visualización (agregar guión si no lo tiene)
+const formatPlacaForDisplay = (placa: string): string => {
+  if (!placa) return placa;
+  
+  // Limpiar la placa (quitar guiones y espacios existentes)
+  const cleanPlaca = placa.replace(/[-\s]/g, '').toUpperCase();
+  
+  // Si tiene el formato correcto ABC123, agregar el guión ABC-123
+  if (cleanPlaca.length === 6 && /^[A-Z]{3}\d{3}$/.test(cleanPlaca)) {
+    return `${cleanPlaca.slice(0, 3)}-${cleanPlaca.slice(3)}`;
+  }
+  
+  // Si no tiene el formato esperado, devolver como está
+  return placa;
+};
+
 const getStatusColor = (estado: Vehicle['estado']) => {
   switch (estado) {
     case 'activo':
@@ -175,7 +191,7 @@ export const VehicleTable: React.FC = () => {
                 {vehicles.map((vehicle) => (
                   <TableRow key={vehicle.id} className="hover:bg-muted/30 border-b border-border last:border-b-0">
                     <TableCell className="font-medium text-card-foreground px-4 py-4 whitespace-nowrap">
-                      {vehicle.placa}
+                      {formatPlacaForDisplay(vehicle.placa)}
                     </TableCell>
                     <TableCell className="text-card-foreground px-4 py-4">
                       <div className="max-w-[200px] truncate" title={vehicle.modelo}>
@@ -294,7 +310,7 @@ export const VehicleTable: React.FC = () => {
             description={
               selectedVehicle?.viajesActivos && selectedVehicle.viajesActivos > 0
                 ? "No se puede eliminar un vehículo con viajes activos."
-                : `¿Seguro que deseas eliminar el vehículo ${selectedVehicle?.placa}? Esta acción no se puede deshacer.`
+                : `¿Seguro que deseas eliminar el vehículo ${formatPlacaForDisplay(selectedVehicle?.placa || '')}? Esta acción no se puede deshacer.`
             }
             confirmText="Eliminar"
             onConfirm={handleConfirmDelete}

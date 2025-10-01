@@ -51,13 +51,31 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
     setErrors({});
   }, [vehicle, mode, open]);
 
+  // Función para normalizar placas (quitar guiones y espacios)
+  const normalizePlaca = (placa: string): string => {
+    return placa.replace(/[-\s]/g, '').toUpperCase();
+  };
+
+  // Función para formatear placas para visualización (agregar guión si no lo tiene)
+  const formatPlacaForDisplay = (placa: string): string => {
+    const normalized = normalizePlaca(placa);
+    if (normalized.length === 6 && /^[A-Z]{3}\d{3}$/.test(normalized)) {
+      return `${normalized.slice(0, 3)}-${normalized.slice(3)}`;
+    }
+    return placa;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.placa.trim()) {
       newErrors.placa = 'La placa es requerida';
-    } else if (!/^[A-Z]{3}-\d{3}$/.test(formData.placa.toUpperCase())) {
-      newErrors.placa = 'Formato de placa inválido (ej: ABC-123)';
+    } else {
+      const normalizedPlaca = normalizePlaca(formData.placa);
+      // Acepta placas con o sin guión, pero debe seguir el patrón ABC123 o ABC-123
+      if (!/^[A-Z]{3}\d{3}$/.test(normalizedPlaca)) {
+        newErrors.placa = 'Formato de placa inválido (ej: ABC123 o ABC-123)';
+      }
     }
 
     if (!formData.modelo.trim()) {
@@ -77,7 +95,13 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
     
     if (!validateForm()) return;
 
-    const success = await onSubmit(formData);
+    // Normalizar la placa antes de enviar al backend (sin guiones)
+    const normalizedData = {
+      ...formData,
+      placa: normalizePlaca(formData.placa)
+    };
+
+    const success = await onSubmit(normalizedData);
     if (success) {
       onOpenChange(false);
     }
@@ -111,7 +135,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
               id="placa"
               value={formData.placa}
               onChange={(e) => handleInputChange('placa', e.target.value.toUpperCase())}
-              placeholder="ABC-123"
+              placeholder="ABC123 o ABC-123"
               disabled={isLoading || mode === 'edit'}
               className={`bg-input border-border text-card-foreground ${errors.placa ? 'border-destructive' : ''}`}
               aria-describedby={errors.placa ? 'placa-error' : undefined}
