@@ -8,12 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // cualquier ruta que NO sea estático ni /api/** → index.html
-        registry.addViewController("/{spring:[\\w\\-]+}")
-                .setViewName("forward:/index.html");
-        registry.addViewController("/**/{spring:[\\w\\-]+}")
-                .setViewName("forward:/index.html");
-        registry.addViewController("/{spring:[\\w\\-]+}/**{spring:[\\w\\-]+}")
+        registry.addViewController("/{path:^(?!api|static|assets|index\\.html).*}")
                 .setViewName("forward:/index.html");
     }
 }

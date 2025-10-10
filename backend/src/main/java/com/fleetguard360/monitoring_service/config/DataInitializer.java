@@ -35,22 +35,27 @@ public class DataInitializer implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
-        logger.info("Initializing database with test data...");
-        
-        // Create roles if they don't exist
-        createRoleIfNotExists("ADMIN");
-        createRoleIfNotExists("USER");
-        
-        // Create admin user if it doesn't exist
-        createAdminUserIfNotExists();
-        
-        // Create operator user if it doesn't exist
-        createOperatorUserIfNotExists();
-        
-        // Create sample vehicles if they don't exist
-        createSampleVehiclesIfNotExists();
-        
-        logger.info("Database initialization completed.");
+			try {
+				logger.info("Initializing database with test data...");
+
+				// Create roles if they don't exist
+				createRoleIfNotExists("ADMIN");
+				createRoleIfNotExists("USER");
+
+				// Create admin user if it doesn't exist
+				createAdminUserIfNotExists();
+
+				// Create operator user if it doesn't exist
+				createOperatorUserIfNotExists();
+
+				// Create sample vehicles if they don't exist
+				createSampleVehiclesIfNotExists();
+
+				logger.info("Database initialization completed.");
+			} catch (Exception e) {
+				logger.warn("could not initialize data: {}", e.getMessage());
+			}
+
     }
     
     private void createRoleIfNotExists(String roleName) {
