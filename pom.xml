@@ -19,6 +19,7 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<sonar.organization>fabricaudea-2025-2</sonar.organization>
 	</properties>
 
 	<dependencies>
