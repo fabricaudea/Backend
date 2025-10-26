@@ -109,7 +109,7 @@ public class VehicleFrontendController {
 
 				plate = plate.replaceAll("[\n\r]", "_");
 
-        logger.info("Frontend - Solicitud para crear nuevo vehículo: placa={}", request.getPlaca());
+        logger.info("Frontend - Solicitud para crear nuevo vehículo: placa={}", plate);
 
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
