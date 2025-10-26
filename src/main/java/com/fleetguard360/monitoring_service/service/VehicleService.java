@@ -42,10 +42,10 @@ public class VehicleService {
      */
     public VehicleResponse createVehicle(CreateVehicleRequest request) {
 				String licensePlate = request.getLicensePlate();
-				if (licensePlate != null){
-					licensePlate = licensePlate.replaceAll("[\n\r]", "_");
-				}
-        logger.info("Creando nuevo vehículo con placa: {}", request.getLicensePlate());
+
+				licensePlate = licensePlate.replaceAll("[\n\r]", "_");
+
+        logger.info("Creando nuevo vehículo con placa: {}", licensePlate);
 
         // Normalizar y validar placa
         String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
