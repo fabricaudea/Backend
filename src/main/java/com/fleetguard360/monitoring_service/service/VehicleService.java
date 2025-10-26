@@ -41,6 +41,10 @@ public class VehicleService {
      * @throws DuplicateResourceException si ya existe un vehículo con esa placa
      */
     public VehicleResponse createVehicle(CreateVehicleRequest request) {
+				String licensePlate = request.getLicensePlate();
+				if (licensePlate != null){
+					licensePlate = licensePlate.replaceAll("[\n\r]", "_");
+				}
         logger.info("Creando nuevo vehículo con placa: {}", request.getLicensePlate());
 
         // Normalizar y validar placa

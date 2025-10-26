@@ -65,7 +65,11 @@ public class AuthController {
             BindingResult bindingResult,
             HttpServletRequest request) {
         
-        logger.info("Intento de login para usuario: {}", loginRequest.getUsername());
+        String username = loginRequest.getUsername();
+				if (username != null) {
+					username = username.replaceAll("[\n\r]", "_");
+				}
+        logger.info("Intento de login para usuario: {}", username);
         
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
@@ -78,9 +82,11 @@ public class AuthController {
                     .body(LoginResponse.failure("Datos de entrada inválidos: " + errorMessage));
         }
         
-        String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
         String clientIp = getClientIpAddress(request);
+				if (clientIp != null) {
+					clientIp = clientIp.replaceAll("[\n\r]", "_");
+				}
         
         try {
             // Verificar si la cuenta está bloqueada

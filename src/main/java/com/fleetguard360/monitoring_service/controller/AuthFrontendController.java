@@ -63,7 +63,11 @@ public class AuthFrontendController {
             BindingResult bindingResult,
             HttpServletRequest request) {
         
-        logger.info("Frontend - Intento de login para usuario: {}", loginRequest.getUsername());
+        String username = loginRequest.getUsername();
+				if (username != null){
+					username = username.replaceAll("[\n\r]", "_");
+				} 
+        logger.info("Frontend - Intento de login para usuario: {}", username);
         
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
@@ -78,7 +82,6 @@ public class AuthFrontendController {
             ));
         }
         
-        String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
         String clientIp = getClientIpAddress(request);
         

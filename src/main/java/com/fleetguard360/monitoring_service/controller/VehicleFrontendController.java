@@ -105,6 +105,10 @@ public class VehicleFrontendController {
             @Valid @RequestBody VehicleFormRequest request,
             BindingResult bindingResult) {
         
+				String plate = request.getPlaca();
+				if (plate != null){
+					plate = plate.replaceAll("[\n\r]", "_");
+				}
         logger.info("Frontend - Solicitud para crear nuevo vehículo: placa={}", request.getPlaca());
 
         // Validar errores de entrada
@@ -167,6 +171,9 @@ public class VehicleFrontendController {
             @Valid @RequestBody VehicleFormRequest request,
             BindingResult bindingResult) {
         
+				if (id != null){
+					id = id.replaceAll("[\n\r]", "_");
+				}
         logger.info("Frontend - Solicitud para actualizar vehículo ID: {}", id);
 
         // Validar errores de entrada
@@ -232,6 +239,9 @@ public class VehicleFrontendController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteVehicle(@PathVariable String id) {
+				if (id != null){
+					id = id.replaceAll("[\n\r]", "_");
+				}
         logger.info("Frontend - Solicitud para eliminar vehículo ID: {}", id);
 
         try {

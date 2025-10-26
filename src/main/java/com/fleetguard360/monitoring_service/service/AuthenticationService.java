@@ -116,6 +116,9 @@ public class AuthenticationService {
                 user.setFailedAttempts(0);
                 user.setLockTime(null);
                 userRepository.save(user);
+								if (username != null){
+									username = username.replaceAll("[\n\r]", "_");
+								}
                 logger.info("Intentos fallidos reseteados para usuario: {}", username);
             }
         } catch (Exception e) {

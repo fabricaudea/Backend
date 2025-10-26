@@ -48,7 +48,11 @@ public class VehicleController {
             @Valid @RequestBody CreateVehicleRequest request,
             BindingResult bindingResult) {
         
-        logger.info("Solicitud para crear nuevo vehículo: placa={}", request.getLicensePlate());
+				String licensePlate = request.getLicensePlate();
+				if (licensePlate != null){
+					licensePlate = licensePlate.replaceAll("[\n\r]", "_");
+				}
+        logger.info("Solicitud para crear nuevo vehículo: placa={}", licensePlate);
 
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
