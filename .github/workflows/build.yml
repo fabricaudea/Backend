@@ -1,4 +1,4 @@
-name: SonarQube
+name: test and report flow
 on:
   push:
     branches:
@@ -6,6 +6,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
+
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
@@ -13,23 +14,41 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'zulu' # Alternative distribution options are available.
+      # Compilar el proyecto
+      - name: Build with Maven
+        run: mvn -B clean compile
+
+      # Ejecutar pruebas y generar reporte Jacoco
+      - name: Run tests with JaCoCo
+        run: mvn -B test jacoco:report
+
+      # Guardar el reporte de cobertura como artefacto 
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
