@@ -49,9 +49,9 @@ public class VehicleController {
             BindingResult bindingResult) {
         
 				String licensePlate = request.getLicensePlate();
-				if (licensePlate != null){
-					licensePlate = licensePlate.replaceAll("[\n\r]", "_");
-				}
+
+				licensePlate = licensePlate.replaceAll("[\n\r]", "_");
+
         logger.info("Solicitud para crear nuevo vehículo: placa={}", licensePlate);
 
         // Validar errores de entrada

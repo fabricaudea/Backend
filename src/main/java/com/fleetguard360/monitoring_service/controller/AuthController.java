@@ -66,9 +66,9 @@ public class AuthController {
             HttpServletRequest request) {
         
         String username = loginRequest.getUsername();
-				if (username != null) {
-					username = username.replaceAll("[\n\r]", "_");
-				}
+
+				username = username.replaceAll("[\n\r]", "_");
+
         logger.info("Intento de login para usuario: {}", username);
         
         // Validar errores de entrada
