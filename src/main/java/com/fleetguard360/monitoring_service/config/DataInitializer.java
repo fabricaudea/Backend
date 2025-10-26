@@ -75,7 +75,15 @@ public class DataInitializer implements CommandLineRunner {
         if (existingUser.isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123")); // Contraseña encriptada
+
+						String rawPassword = System.getenv("ADMIN_DEFAULT_PASSWORD");
+
+						if (rawPassword == null || rawPassword.isBlank()){
+							rawPassword = "admin123";
+							logger.warn("No esta definida la variable de entorno ADMIN_DEFAULT_PASSWORD");
+						}
+
+            admin.setPassword(passwordEncoder.encode(rawPassword)); // Contraseña encriptada
             admin.setEnabled(true);
             
             // Add ADMIN role
@@ -96,7 +104,15 @@ public class DataInitializer implements CommandLineRunner {
         if (existingUser.isEmpty()) {
             User operator = new User();
             operator.setUsername("operador");
-            operator.setPassword(passwordEncoder.encode("op123")); // Contraseña encriptada
+
+						String rawPassword = System.getenv("OPERATOR_DEFAULT_PASSWORD");
+
+						if (rawPassword == null || rawPassword.isBlank()){
+							rawPassword = "admin123";
+							logger.warn("No esta definida la variable de entorno OPERATOR_DEFAULT_PASSWORD");
+						}
+
+            operator.setPassword(passwordEncoder.encode(rawPassword)); // Contraseña encriptada
             operator.setEnabled(true);
             
             // Add USER role
