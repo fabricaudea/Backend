@@ -65,12 +65,6 @@ public class AuthController {
             BindingResult bindingResult,
             HttpServletRequest request) {
         
-        String username = loginRequest.getUsername();
-
-				username = username.replaceAll("[\n\r]", "_");
-
-        logger.info("Intento de login para usuario: {}", username);
-        
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream()
@@ -81,6 +75,8 @@ public class AuthController {
             return ResponseEntity.badRequest()
                     .body(LoginResponse.failure("Datos de entrada inválidos: " + errorMessage));
         }
+
+				String username = authenticationService.prepareUsername(loginRequest.getUsername(), "API");
         
         String password = loginRequest.getPassword();
         String clientIp = getClientIpAddress(request);
