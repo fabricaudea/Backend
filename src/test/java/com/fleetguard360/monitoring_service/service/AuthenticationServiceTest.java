@@ -1,20 +1,31 @@
 package com.fleetguard360.monitoring_service.service;
 
-import com.fleetguard360.monitoring_service.model.LoginHistory;
-import com.fleetguard360.monitoring_service.model.User;
-import com.fleetguard360.monitoring_service.repository.LoginHistoryRepository;
-import com.fleetguard360.monitoring_service.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fleetguard360.monitoring_service.model.LoginHistory;
+import com.fleetguard360.monitoring_service.model.User;
+import com.fleetguard360.monitoring_service.repository.LoginHistoryRepository;
+import com.fleetguard360.monitoring_service.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
