@@ -76,6 +76,12 @@ public class Vehicle {
     @Column(name = "updated_by", length = 50)
     private String updatedBy;
 
+		@Column(name = "latitude")
+		private Double latitude = 6.140661;
+
+		@Column(name = "longitude")
+		private Double longitude = -75.379754;
+
     // Constructors
     public Vehicle() {
         this.createdAt = LocalDateTime.now();
@@ -235,6 +241,8 @@ public class Vehicle {
         return VehicleStatus.IN_USE.equals(this.status);
     }
 
+		 
+
     // equals and hashCode
     @Override
     public boolean equals(Object o) {
@@ -262,4 +270,20 @@ public class Vehicle {
                 ", createdAt=" + createdAt +
                 '}';
     }
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
 }
