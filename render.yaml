@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: fg-backend
+    env: docker
+    plan: free
+    autoDeploy: true
+
+    # Monorepo: dile a Render dónde está el Dockerfile y el contexto
+    dockerfilePath: backend/Dockerfile
+    buildContext: backend
+
+    # Usa Actuator (ya incluido en tu pom) como healthcheck
+    healthCheckPath: /actuator/health
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo             # H2 en memoria para demo barata
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8"
+
