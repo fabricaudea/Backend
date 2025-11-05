@@ -32,15 +32,15 @@ public class VehicleFrontendController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleFrontendController.class);
 
-		private static final String logregex = "[\n\r]"; 
+		private static final String LOG_REGEX = "[\n\r]"; 
 
-		private static final String errorString = "error"; 
+		private static final String ERROR_STRING = "error"; 
 
-		private static final String message = "message"; 
+		private static final String MESSAGE = "message"; 
 
-		private static final String internalError = "INTERNAL_ERROR"; 
+		private static final String INTERNAL_ERROR = "INTERNAL_ERROR"; 
 
-		private static final String errorInternoServidor = "Error interno del servidor"; 
+		private static final String ERROR_INTERNO_SERVIDOR = "Error interno del servidor"; 
 
     @Autowired
     private VehicleService vehicleService;
@@ -117,7 +117,7 @@ public class VehicleFrontendController {
         
 				String plate = request.getPlaca();
 
-				plate = plate.replaceAll(logregex, "_");
+				plate = plate.replaceAll(LOG_REGEX, "_");
 
         logger.info("Frontend - Solicitud para crear nuevo vehículo: placa={}", plate);
 
@@ -129,8 +129,8 @@ public class VehicleFrontendController {
             
             logger.warn("Frontend - Errores de validación al crear vehículo: {}", errorMessage);
             return ResponseEntity.badRequest().body(Map.of(
-                errorString, "VALIDATION_ERROR",
-                message, "Datos de entrada inválidos: " + errorMessage
+                ERROR_STRING, "VALIDATION_ERROR",
+                MESSAGE, "Datos de entrada inválidos: " + errorMessage
             ));
         }
 
@@ -164,8 +164,8 @@ public class VehicleFrontendController {
         } catch (Exception e) {
             logger.error("Frontend - Error al crear vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                errorString, internalError,
-                message, errorInternoServidor
+                ERROR_STRING, INTERNAL_ERROR,
+                MESSAGE, ERROR_INTERNO_SERVIDOR
             ));
         }
     }
@@ -181,7 +181,7 @@ public class VehicleFrontendController {
             @Valid @RequestBody VehicleFormRequest request,
             BindingResult bindingResult) {
         
-				id = id.replaceAll(logregex, "_");
+				id = id.replaceAll(LOG_REGEX, "_");
 
         logger.info("Frontend - Solicitud para actualizar vehículo ID: {}", id);
 
@@ -193,8 +193,8 @@ public class VehicleFrontendController {
             
             logger.warn("Frontend - Errores de validación al actualizar vehículo: {}", errorMessage);
             return ResponseEntity.badRequest().body(Map.of(
-                errorString, "VALIDATION_ERROR",
-                message, "Datos de entrada inválidos: " + errorMessage
+                ERROR_STRING, "VALIDATION_ERROR",
+                MESSAGE, "Datos de entrada inválidos: " + errorMessage
             ));
         }
 
@@ -229,14 +229,14 @@ public class VehicleFrontendController {
         } catch (NumberFormatException e) {
             logger.warn("Frontend - ID de vehículo inválido: {}", id);
             return ResponseEntity.badRequest().body(Map.of(
-                errorString, "INVALID_ID",
-                message, "ID de vehículo inválido"
+                ERROR_STRING, "INVALID_ID",
+                MESSAGE, "ID de vehículo inválido"
             ));
         } catch (Exception e) {
             logger.error("Frontend - Error al actualizar vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                errorString, internalError,
-                message, errorInternoServidor
+                ERROR_STRING, INTERNAL_ERROR,
+                MESSAGE, ERROR_INTERNO_SERVIDOR
             ));
         }
     }
@@ -249,7 +249,7 @@ public class VehicleFrontendController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteVehicle(@PathVariable String id) {
 
-				id = id.replaceAll(logregex, "_");
+				id = id.replaceAll(LOG_REGEX, "_");
 
         logger.info("Frontend - Solicitud para eliminar vehículo ID: {}", id);
 
@@ -261,20 +261,20 @@ public class VehicleFrontendController {
             logger.info("Frontend - Vehículo eliminado exitosamente: ID={}", vehicleId);
             
             return ResponseEntity.ok(Map.of(
-                message, "Vehículo eliminado exitosamente"
+                MESSAGE, "Vehículo eliminado exitosamente"
             ));
             
         } catch (NumberFormatException e) {
             logger.warn("Frontend - ID de vehículo inválido: {}", id);
             return ResponseEntity.badRequest().body(Map.of(
-                errorString, "INVALID_ID",
-                message, "ID de vehículo inválido"
+                ERROR_STRING, "INVALID_ID",
+                MESSAGE, "ID de vehículo inválido"
             ));
         } catch (Exception e) {
             logger.error("Frontend - Error al eliminar vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                errorString, internalError,
-                message, errorInternoServidor
+                ERROR_STRING, INTERNAL_ERROR,
+                MESSAGE, ERROR_INTERNO_SERVIDOR
             ));
         }
     }

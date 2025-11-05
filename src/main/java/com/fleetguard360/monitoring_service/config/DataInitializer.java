@@ -21,7 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
-		private static final String system = "system";
+		private static final String SYSTEM = "system";
     
     private UserRepository userRepository;
     
@@ -145,7 +145,7 @@ public class DataInitializer implements CommandLineRunner {
             vehicle1.setModel("Mercedes Sprinter 2023");
             vehicle1.setCapacity(12);
             vehicle1.setStatus(VehicleStatus.AVAILABLE);
-            vehicle1.setCreatedBy(system);
+            vehicle1.setCreatedBy(SYSTEM);
             vehicleRepository.save(vehicle1);
             
             // Vehículo 2
@@ -154,7 +154,7 @@ public class DataInitializer implements CommandLineRunner {
             vehicle2.setModel("Ford Transit 2022");
             vehicle2.setCapacity(8);
             vehicle2.setStatus(VehicleStatus.MAINTENANCE);
-            vehicle2.setCreatedBy(system);
+            vehicle2.setCreatedBy(SYSTEM);
             vehicleRepository.save(vehicle2);
             
             // Vehículo 3
@@ -163,7 +163,7 @@ public class DataInitializer implements CommandLineRunner {
             vehicle3.setModel("Iveco Daily 2023");
             vehicle3.setCapacity(15);
             vehicle3.setStatus(VehicleStatus.AVAILABLE);
-            vehicle3.setCreatedBy(system);
+            vehicle3.setCreatedBy(SYSTEM);
             vehicleRepository.save(vehicle3);
             
             logger.info("Created {} sample vehicles", 3);
