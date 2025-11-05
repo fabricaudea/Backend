@@ -14,12 +14,16 @@ import java.util.Map;
 @RequestMapping("/api/health")
 public class HealthController {
 
-    @Autowired
     private DataSource dataSource;
 
 		private static final String STATUS = "status";
 
 		private static final String MESSAGE = "message";
+
+		@Autowired
+		public HealthController ( DataSource dataSource) {
+			this.dataSource = dataSource;
+		}
 
     @GetMapping("/db")
     public Map<String, Object> checkDatabaseConnection() {

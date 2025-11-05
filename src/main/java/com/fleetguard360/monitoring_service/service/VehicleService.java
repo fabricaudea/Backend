@@ -32,8 +32,12 @@ public class VehicleService {
 
 		private static final String VEHICULO_NO_ENCONTRADO = "Vehículo no encontrado con ID: ";
 
-    @Autowired
     private VehicleRepository vehicleRepository;
+
+		@Autowired
+		public VehicleService (VehicleRepository vehicleRepository) {
+			this.vehicleRepository = vehicleRepository;
+		}
 
     /**
      * Crea un nuevo vehículo en la flota

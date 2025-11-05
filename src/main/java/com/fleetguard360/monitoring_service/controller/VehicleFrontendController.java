@@ -42,8 +42,12 @@ public class VehicleFrontendController {
 
 		private static final String ERROR_INTERNO_SERVIDOR = "Error interno del servidor"; 
 
-    @Autowired
     private VehicleService vehicleService;
+
+		@Autowired
+		public VehicleFrontendController ( VehicleService vehicleService ) {
+			this.vehicleService = vehicleService;
+		}
 
     /**
      * Lista todos los vehículos en formato compatible con el frontend

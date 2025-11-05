@@ -24,14 +24,18 @@ public class TestController {
 
 		private static final String USERNAME_STRING = "username";
 
-    @Autowired
     private UserRepository userRepository;
     
-    @Autowired
     private RoleRepository roleRepository;
     
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+		@Autowired
+		public TestController ( UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+			this.userRepository = userRepository;
+			this.roleRepository = roleRepository;
+			this.passwordEncoder = passwordEncoder;
+		}
 
     @GetMapping("/users")
     public List<User> getAllUsers() {

@@ -30,8 +30,12 @@ public class VehicleController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleController.class);
 
-    @Autowired
     private VehicleService vehicleService;
+
+		@Autowired
+		public VehicleController ( VehicleService vehicleService ) {
+			this.vehicleService = vehicleService;
+		}
 
     /**
      * HU: Dar de alta vehículos en la flota

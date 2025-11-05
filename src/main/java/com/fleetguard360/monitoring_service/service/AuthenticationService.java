@@ -21,11 +21,15 @@ public class AuthenticationService {
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final int LOCK_TIME_DURATION = 15; // minutes
 
-    @Autowired
     private UserRepository userRepository;
     
-    @Autowired
     private LoginHistoryRepository loginHistoryRepository;
+
+		@Autowired
+		public AuthenticationService (UserRepository userRepository, LoginHistoryRepository loginHistoryRepository) {
+			this.userRepository = userRepository;
+			this.loginHistoryRepository = loginHistoryRepository;
+		}
 
 		public String prepareUsername(String username, String context) {
 			if (username == null) {

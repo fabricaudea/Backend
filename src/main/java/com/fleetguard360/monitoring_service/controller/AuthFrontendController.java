@@ -45,14 +45,18 @@ public class AuthFrontendController {
 
 		private static final String ERROR_STRING = "error";
     
-    @Autowired
     private AuthenticationManager authenticationManager;
     
-    @Autowired
     private AuthenticationService authenticationService;
     
-    @Autowired
     private CustomUserDetailsService userDetailsService;
+
+		@Autowired
+		public AuthFrontendController ( AuthenticationManager authenticationManager, AuthenticationService authenticationService, CustomUserDetailsService userDetailsService) {
+			this.authenticationManager = authenticationManager;
+			this.authenticationService = authenticationService;
+			this.userDetailsService = userDetailsService;
+		}
     
     /**
      * Endpoint para autenticación de usuarios compatible con el frontend

@@ -1,16 +1,6 @@
 package com.fleetguard360.monitoring_service.controller;
 
-import com.fleetguard360.monitoring_service.dto.LoginRequest;
-import com.fleetguard360.monitoring_service.dto.LoginResponse;
-import com.fleetguard360.monitoring_service.dto.LogoutResponse;
-import com.fleetguard360.monitoring_service.model.Role;
-import com.fleetguard360.monitoring_service.model.User;
-import com.fleetguard360.monitoring_service.service.AuthenticationService;
-import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +18,24 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.stream.Collectors;
+import com.fleetguard360.monitoring_service.dto.LoginRequest;
+import com.fleetguard360.monitoring_service.dto.LoginResponse;
+import com.fleetguard360.monitoring_service.dto.LogoutResponse;
+import com.fleetguard360.monitoring_service.model.Role;
+import com.fleetguard360.monitoring_service.model.User;
+import com.fleetguard360.monitoring_service.service.AuthenticationService;
+import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 /**
  * Controlador REST para autenticación de usuarios
@@ -66,7 +71,7 @@ public class AuthController {
      * @return ResponseEntity con LoginResponse
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             BindingResult bindingResult,
             HttpServletRequest request) {
@@ -160,7 +165,7 @@ public class AuthController {
      * @return ResponseEntity con LogoutResponse
      */
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
         
         String username = getCurrentUsername();
         String clientIp = getClientIpAddress(request);
