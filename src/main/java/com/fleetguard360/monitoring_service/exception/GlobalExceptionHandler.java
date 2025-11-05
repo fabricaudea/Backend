@@ -83,6 +83,26 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+		/**
+     * Maneja excepciones de acceso denegado (Spring Security)
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            org.springframework.security.access.AccessDeniedException ex, WebRequest request) {
+        
+        logger.warn("Acceso denegado: {}", ex.getMessage());
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                "ACCESS_DENIED",
+                "No tiene permiso para realizar esta acción.",
+                HttpStatus.FORBIDDEN.value(),
+                LocalDateTime.now(),
+                request.getDescription(false)
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     /**
      * Maneja errores de validación de entrada
      */

@@ -47,12 +47,6 @@ public class VehicleController {
     public ResponseEntity<?> createVehicle(
             @Valid @RequestBody CreateVehicleRequest request,
             BindingResult bindingResult) {
-        
-				String licensePlate = request.getLicensePlate();
-
-				licensePlate = licensePlate.replaceAll("[\n\r]", "_");
-
-        logger.info("Solicitud para crear nuevo vehículo: placa={}", licensePlate);
 
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
@@ -66,6 +60,13 @@ public class VehicleController {
                 "Datos de entrada inválidos: " + errorMessage
             ));
         }
+        
+				String licensePlate = request.getLicensePlate();
+
+				licensePlate = licensePlate.replaceAll("[\n\r]", "_");
+
+        logger.info("Solicitud para crear nuevo vehículo: placa={}", licensePlate);
+
 
         try {
             VehicleResponse vehicleResponse = vehicleService.createVehicle(request);
@@ -144,8 +145,6 @@ public class VehicleController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateVehicleRequest request,
             BindingResult bindingResult) {
-        
-        logger.info("Solicitud para actualizar vehículo ID: {}", id);
 
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
@@ -159,6 +158,9 @@ public class VehicleController {
                 "Datos de entrada inválidos: " + errorMessage
             ));
         }
+        
+        logger.info("Solicitud para actualizar vehículo ID: {}", id);
+
 
         try {
             VehicleResponse vehicleResponse = vehicleService.updateVehicle(id, request);
