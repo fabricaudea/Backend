@@ -10,7 +10,7 @@ import jakarta.validation.constraints.*;
 public class CreateVehicleRequest {
 
     @NotBlank(message = "La placa es obligatoria")
-    @Pattern(regexp = "^[A-Z]{3}-?[0-9]{3}$", 
+    @Pattern(regexp = "^[A-Z]{3}-?\\d{3}$", 
              message = "Formato de placa inválido (ej: ABC-123 o ABC123)")
     private String licensePlate;
 

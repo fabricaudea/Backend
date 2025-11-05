@@ -1,5 +1,7 @@
 package com.fleetguard360.monitoring_service.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -7,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * Útil para crear datos de prueba
  */
 public class PasswordHashGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(PasswordHashGenerator.class);
     
     public static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -19,15 +23,15 @@ public class PasswordHashGenerator {
             "fleet123"
         };
         
-        System.out.println("=== Generador de Hashes BCrypt ===");
-        System.out.println();
+        logger.info("=== Generador de Hashes BCrypt ===");
+        logger.info("\n");
         
         for (String password : passwords) {
             String hash = encoder.encode(password);
-            System.out.println("Contraseña: " + password);
-            System.out.println("Hash BCrypt: " + hash);
-            System.out.println("Verificación: " + encoder.matches(password, hash));
-            System.out.println("-".repeat(80));
+            logger.info("Contraseña: " + password);
+            logger.info("Hash BCrypt: " + hash);
+            logger.info("Verificación: " + encoder.matches(password, hash));
+            logger.info("-".repeat(80));
         }
     }
 }
