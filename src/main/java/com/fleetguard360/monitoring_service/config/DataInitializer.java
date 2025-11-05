@@ -21,17 +21,21 @@ public class DataInitializer implements CommandLineRunner {
     
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
     
-    @Autowired
     private UserRepository userRepository;
     
-    @Autowired
     private RoleRepository roleRepository;
     
-    @Autowired
     private VehicleRepository vehicleRepository;
     
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+		@Autowired
+		public DataInitializer ( UserRepository userRepository, RoleRepository roleRepository, VehicleRepository vehicleRepository, PasswordEncoder passwordEncoder) {
+			this.userRepository = userRepository;
+			this.roleRepository = roleRepository;
+			this.vehicleRepository = vehicleRepository;
+			this.passwordEncoder = passwordEncoder;
+		}
     
     @Override
     public void run(String... args) throws Exception {

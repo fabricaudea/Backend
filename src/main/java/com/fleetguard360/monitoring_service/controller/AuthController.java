@@ -41,14 +41,18 @@ public class AuthController {
     
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     
-    @Autowired
     private AuthenticationManager authenticationManager;
     
-    @Autowired
     private AuthenticationService authenticationService;
     
-    @Autowired
     private CustomUserDetailsService userDetailsService;
+
+		@Autowired
+		public AuthController(AuthenticationManager authenticationManager, AuthenticationService authenticationService, CustomUserDetailsService userDetailsService) {
+			this.authenticationManager = authenticationManager;
+			this.authenticationService = authenticationService;
+			this.userDetailsService = userDetailsService;
+		}
     
     /**
      * Endpoint para autenticación de usuarios

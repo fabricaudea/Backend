@@ -24,8 +24,12 @@ import java.util.Arrays;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    @Autowired
     private CustomUserDetailsService userDetailsService;
+
+		@Autowired
+		public SecurityConfig(CustomUserDetailsService userDetailsService) {
+			this.userDetailsService = userDetailsService;
+		}
 
     @Bean
     public PasswordEncoder passwordEncoder() {

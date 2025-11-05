@@ -17,8 +17,12 @@ public class AuthenticationEventListener {
     
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationEventListener.class);
 
-    @Autowired
     private AuthenticationService authenticationService;
+
+		@Autowired
+		public AuthenticationEventListener( AuthenticationService authenticationService) {
+			this.authenticationService = authenticationService;
+		}
 
     @EventListener
     public void handleAuthenticationSuccess(AuthenticationSuccessEvent event) {
