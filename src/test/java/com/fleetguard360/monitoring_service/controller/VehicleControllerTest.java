@@ -1,15 +1,23 @@
 package com.fleetguard360.monitoring_service.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fleetguard360.monitoring_service.config.SecurityConfig;
-import com.fleetguard360.monitoring_service.dto.CreateVehicleRequest;
-import com.fleetguard360.monitoring_service.dto.UpdateVehicleRequest;
-import com.fleetguard360.monitoring_service.dto.VehicleResponse;
-import com.fleetguard360.monitoring_service.model.VehicleStatus;
-import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
-import com.fleetguard360.monitoring_service.service.VehicleService;
-// Importar la excepción específica de tu handler
-import com.fleetguard360.monitoring_service.exception.ResourceNotFoundException;
+// Importar todos los matchers y builders estáticos
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +28,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-// Importar todos los matchers y builders estáticos
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fleetguard360.monitoring_service.config.SecurityConfig;
+import com.fleetguard360.monitoring_service.dto.CreateVehicleRequest;
+import com.fleetguard360.monitoring_service.dto.UpdateVehicleRequest;
+import com.fleetguard360.monitoring_service.dto.VehicleResponse;
+// Importar la excepción específica de tu handler
+import com.fleetguard360.monitoring_service.exception.ResourceNotFoundException;
+import com.fleetguard360.monitoring_service.model.VehicleStatus;
+import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
+import com.fleetguard360.monitoring_service.service.VehicleService;
 
 /**
  * Pruebas unitarias para VehicleController.
@@ -44,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import({SecurityConfig.class, com.fleetguard360.monitoring_service.exception.GlobalExceptionHandler.class})
 
-public class VehicleControllerTest {
+class VehicleControllerTest {
 
     @Autowired
     private MockMvc mockMvc; // Permite simular peticiones HTTP
@@ -292,7 +297,7 @@ public class VehicleControllerTest {
         // Arrange
         VehicleStatus status = VehicleStatus.AVAILABLE;
         // FIX: Hacemos el mock más específico para el enum
-        when(vehicleService.getVehiclesByStatus(eq(status))).thenReturn(List.of(vehicleResponse));
+        when(vehicleService.getVehiclesByStatus(status)).thenReturn(List.of(vehicleResponse));
 
         mockMvc.perform(get("/api/vehicles/status/{status}", "AVAILABLE")
                         .contentType(MediaType.APPLICATION_JSON))

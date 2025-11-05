@@ -32,6 +32,8 @@ public class VehicleFrontendController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleFrontendController.class);
 
+		private static final String logregex = "[\n\r]"; 
+
     @Autowired
     private VehicleService vehicleService;
 
@@ -107,7 +109,7 @@ public class VehicleFrontendController {
         
 				String plate = request.getPlaca();
 
-				plate = plate.replaceAll("[\n\r]", "_");
+				plate = plate.replaceAll(logregex, "_");
 
         logger.info("Frontend - Solicitud para crear nuevo vehículo: placa={}", plate);
 
@@ -171,7 +173,7 @@ public class VehicleFrontendController {
             @Valid @RequestBody VehicleFormRequest request,
             BindingResult bindingResult) {
         
-				id = id.replaceAll("[\n\r]", "_");
+				id = id.replaceAll(logregex, "_");
 
         logger.info("Frontend - Solicitud para actualizar vehículo ID: {}", id);
 
@@ -239,7 +241,7 @@ public class VehicleFrontendController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteVehicle(@PathVariable String id) {
 
-				id = id.replaceAll("[\n\r]", "_");
+				id = id.replaceAll(logregex, "_");
 
         logger.info("Frontend - Solicitud para eliminar vehículo ID: {}", id);
 

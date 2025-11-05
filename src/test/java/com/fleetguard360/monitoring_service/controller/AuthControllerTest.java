@@ -44,7 +44,7 @@ import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
 
 @WebMvcTest(controllers = AuthController.class)
 @Import(SecurityConfig.class)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -50,7 +50,7 @@ import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
  */
 @WebMvcTest(controllers = AuthFrontendController.class)
 @Import(SecurityConfig.class)
-public class AuthFrontendControllerTest {
+class AuthFrontendControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
