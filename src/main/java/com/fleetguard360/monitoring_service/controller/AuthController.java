@@ -3,6 +3,7 @@ package com.fleetguard360.monitoring_service.controller;
 import com.fleetguard360.monitoring_service.dto.LoginRequest;
 import com.fleetguard360.monitoring_service.dto.LoginResponse;
 import com.fleetguard360.monitoring_service.dto.LogoutResponse;
+import com.fleetguard360.monitoring_service.model.Role;
 import com.fleetguard360.monitoring_service.model.User;
 import com.fleetguard360.monitoring_service.service.AuthenticationService;
 import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.BindingResult;
@@ -115,7 +117,7 @@ public class AuthController {
             // Obtener información del usuario autenticado
             User user = userDetailsService.loadUserEntityByUsername(username);
             var roles = user.getRoles().stream()
-                    .map(role -> role.getName())
+                    .map(Role::getName)
                     .collect(Collectors.toSet());
             
             logger.info("Login exitoso para usuario: {} desde IP: {}", username, clientIp);
@@ -205,7 +207,7 @@ public class AuthController {
             
             String username = authentication.getName();
             var authorities = authentication.getAuthorities().stream()
-                    .map(grantedAuthority -> grantedAuthority.getAuthority())
+                    .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toSet());
             
             return ResponseEntity.ok(LoginResponse.success(username, authorities));

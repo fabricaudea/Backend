@@ -269,18 +269,10 @@ class AuthFrontendControllerTest {
         // Usamos .with(anonymous()) para que el filtro de seguridad nos deje pasar
         // pero SecurityContextHolder.getContext().getAuthentication().getName() sea "anonymousUser".
         
-        // CORRECCIÓN: La suposición anterior era incorrecta.
-        // El filtro de seguridad SÍ se ejecuta ANTES que el controlador.
-        // Como /api/frontend/auth/me es .authenticated(), el filtro
-        // bloqueará al usuario anónimo con un 403 Forbidden.
         mockMvc.perform(get("/api/frontend/auth/me")
                 .with(anonymous()) // Simula un usuario anónimo reconocido por Spring
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden()); // <-- CAMBIADO DE isUnauthorized() (401) a isForbidden() (403)
-                
-                // Estas líneas se eliminan porque el filtro 403 devuelve un cuerpo vacío
-                // .andExpect(jsonPath("$.error").value("NOT_AUTHENTICATED"))
-                // .andExpect(jsonPath("$.message").value("Usuario no autenticado"));
+                .andExpect(status().isForbidden());                 
     }
 
     @Test

@@ -97,7 +97,7 @@ public class TestController {
             "enabled", user.isEnabled(),
             "failedAttempts", user.getFailedAttempts(),
             "lockTime", user.getLockTime(),
-            "roles", user.getRoles().stream().map(role -> role.getName()).toList()
+            "roles", user.getRoles().stream().map(Role::getName).toList()
         ));
     }
     
