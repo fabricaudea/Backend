@@ -17,20 +17,24 @@ public class HealthController {
     @Autowired
     private DataSource dataSource;
 
+		private static final String status = "status";
+
+		private static final String message = "message";
+
     @GetMapping("/db")
     public Map<String, Object> checkDatabaseConnection() {
         Map<String, Object> response = new HashMap<>();
         
         try (Connection connection = dataSource.getConnection()) {
-            response.put("status", "UP");
+            response.put(status, "UP");
             response.put("database", connection.getMetaData().getDatabaseProductName());
             response.put("version", connection.getMetaData().getDatabaseProductVersion());
             response.put("url", connection.getMetaData().getURL());
-            response.put("message", "Database connection successful");
+            response.put(message, "Database connection successful");
         } catch (Exception e) {
-            response.put("status", "DOWN");
+            response.put(status, "DOWN");
             response.put("error", e.getMessage());
-            response.put("message", "Database connection failed");
+            response.put(message, "Database connection failed");
         }
         
         return response;
@@ -39,9 +43,9 @@ public class HealthController {
     @GetMapping("/app")
     public Map<String, String> checkApplication() {
         Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
+        response.put(status, "UP");
         response.put("application", "FleetGuard360 Monitoring Service");
-        response.put("message", "Application is running");
+        response.put(message, "Application is running");
         return response;
     }
 }

@@ -26,6 +26,10 @@ public class SecurityConfig {
 
     private CustomUserDetailsService userDetailsService;
 
+		private static final String admin = "ADMIN";
+
+		private static final String user = "USER";
+
 		@Autowired
 		public SecurityConfig(CustomUserDetailsService userDetailsService) {
 			this.userDetailsService = userDetailsService;
@@ -75,12 +79,12 @@ public class SecurityConfig {
                 // Endpoints específicos del frontend
                 .requestMatchers("/api/frontend/auth/me").authenticated()
                 .requestMatchers("/api/frontend/auth/logout").authenticated()
-                .requestMatchers("/api/frontend/vehicles/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/api/frontend/vehicles/**").hasAnyRole(admin, user)
                 // Endpoints originales de vehículos - requieren autenticación con roles específicos
-                .requestMatchers("/api/vehicles/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/api/vehicles/**").hasAnyRole(admin, user)
                 // Endpoints que requieren roles específicos
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/admin/**").hasRole(admin)
+                .requestMatchers("/api/user/**").hasAnyRole(user, admin)
                 // Endpoint de logout requiere autenticación
                 .requestMatchers("/api/auth/logout", "/api/auth/status").authenticated()
                 // Todos los demás requieren autenticación

@@ -40,6 +40,10 @@ import java.util.stream.Collectors;
 public class AuthFrontendController {
     
     private static final Logger logger = LoggerFactory.getLogger(AuthFrontendController.class);
+
+		private static final String message = "message";
+
+		private static final String errorString = "error";
     
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -71,8 +75,8 @@ public class AuthFrontendController {
             
             logger.warn("Frontend - Errores de validación en login: {}", errorMessage);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "VALIDATION_ERROR",
-                "message", "Datos de entrada inválidos: " + errorMessage
+                errorString, "VALIDATION_ERROR",
+								message, "Datos de entrada inválidos: " + errorMessage
             ));
         }
 
@@ -86,8 +90,8 @@ public class AuthFrontendController {
             if (authenticationService.isAccountLocked(username)) {
                 logger.warn("Frontend - Intento de login en cuenta bloqueada: {} desde IP: {}", username, clientIp);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "error", "ACCOUNT_LOCKED",
-                    "message", "Cuenta bloqueada por múltiples intentos fallidos. Intente más tarde."
+                    errorString, "ACCOUNT_LOCKED",
+                    message, "Cuenta bloqueada por múltiples intentos fallidos. Intente más tarde."
                 ));
             }
             
@@ -118,15 +122,15 @@ public class AuthFrontendController {
         } catch (LockedException e) {
             logger.warn("Frontend - Cuenta bloqueada durante autenticación: {} desde IP: {}", username, clientIp);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                "error", "ACCOUNT_LOCKED",
-                "message", "Cuenta bloqueada temporalmente"
+                errorString, "ACCOUNT_LOCKED",
+                message, "Cuenta bloqueada temporalmente"
             ));
                     
         } catch (DisabledException e) {
             logger.warn("Frontend - Cuenta deshabilitada: {} desde IP: {}", username, clientIp);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                "error", "ACCOUNT_DISABLED",
-                "message", "Cuenta deshabilitada"
+                errorString, "ACCOUNT_DISABLED",
+                message, "Cuenta deshabilitada"
             ));
                     
         } catch (BadCredentialsException e) {
@@ -136,8 +140,8 @@ public class AuthFrontendController {
             authenticationService.recordFailedAttempt(username, clientIp);
             
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                "error", "INVALID_CREDENTIALS",
-                "message", "Usuario o contraseña incorrectos"
+                errorString, "INVALID_CREDENTIALS",
+                message, "Usuario o contraseña incorrectos"
             ));
                     
         } catch (AuthenticationException e) {
@@ -145,8 +149,8 @@ public class AuthFrontendController {
                         username, clientIp, e.getMessage());
             
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                "error", "AUTHENTICATION_ERROR",
-                "message", "Error de autenticación"
+                errorString, "AUTHENTICATION_ERROR",
+                message, "Error de autenticación"
             ));
         }
     }
@@ -175,7 +179,7 @@ public class AuthFrontendController {
             logger.info("Frontend - Logout exitoso para usuario: {}", username);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Logout exitoso",
+                message, "Logout exitoso",
                 "status", "SUCCESS"
             ));
             
@@ -183,8 +187,8 @@ public class AuthFrontendController {
             logger.error("Frontend - Error durante logout para usuario: {}, Error: {}", username, e.getMessage());
             
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "LOGOUT_ERROR",
-                "message", "Error durante el logout"
+                errorString, "LOGOUT_ERROR",
+                message, "Error durante el logout"
             ));
         }
     }
@@ -201,8 +205,8 @@ public class AuthFrontendController {
             if (authentication == null || !authentication.isAuthenticated() || 
                 "anonymousUser".equals(authentication.getName())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "error", "NOT_AUTHENTICATED",
-                    "message", "Usuario no autenticado"
+                    errorString, "NOT_AUTHENTICATED",
+                    message, "Usuario no autenticado"
                 ));
             }
             
@@ -215,8 +219,8 @@ public class AuthFrontendController {
         } catch (Exception e) {
             logger.error("Frontend - Error al obtener usuario actual: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", "Error interno del servidor"
+                errorString, "INTERNAL_ERROR",
+                message, "Error interno del servidor"
             ));
         }
     }

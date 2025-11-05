@@ -24,6 +24,9 @@ public class VehicleResponseFrontend {
     @JsonProperty("viajesActivos")
     private Integer viajesActivos;
 
+		// Constantes
+		private static final String inactivoString = "inactivo"; 
+
     // Constructor vacío
     public VehicleResponseFrontend() {}
 
@@ -49,13 +52,13 @@ public class VehicleResponseFrontend {
      * Mapea los estados del backend a los esperados por el frontend
      */
     private String mapStatusToFrontend(VehicleStatus status) {
-        if (status == null) return "inactivo";
+        if (status == null) return inactivoString;
         
         return switch (status) {
             case AVAILABLE, IN_USE -> "activo";
             case MAINTENANCE -> "mantenimiento";
-            case OUT_OF_SERVICE, INACTIVE -> "inactivo";
-            default -> "inactivo";
+            case OUT_OF_SERVICE, INACTIVE -> inactivoString;
+            default -> inactivoString;
         };
     }
 

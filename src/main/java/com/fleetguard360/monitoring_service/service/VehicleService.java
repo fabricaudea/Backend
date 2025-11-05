@@ -30,6 +30,8 @@ public class VehicleService {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleService.class);
 
+		private static final String vehiculoNoEncontrado = "Vehículo no encontrado con ID: ";
+
     @Autowired
     private VehicleRepository vehicleRepository;
 
@@ -82,7 +84,7 @@ public class VehicleService {
         logger.debug("Buscando vehículo por ID: {}", id);
         
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(vehiculoNoEncontrado+ id));
         
         return VehicleResponse.from(vehicle);
     }
@@ -165,7 +167,7 @@ public class VehicleService {
 
         // Verificar que el vehículo existe
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(vehiculoNoEncontrado+ id));
 
         // Normalizar nueva placa
         String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
@@ -201,7 +203,7 @@ public class VehicleService {
 
         // Verificar que el vehículo existe
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(vehiculoNoEncontrado+ id));
 
         // Verificar que el vehículo no esté en uso
         if (vehicle.isInUse()) {
@@ -231,7 +233,7 @@ public class VehicleService {
         logger.warn("Eliminación permanente de vehículo ID: {}", id);
 
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(vehiculoNoEncontrado+ id));
 
         vehicleRepository.delete(vehicle);
         logger.info("Vehículo eliminado permanentemente: ID={}, Placa={}", id, vehicle.getLicensePlate());
@@ -248,7 +250,7 @@ public class VehicleService {
         logger.info("Cambiando estado de vehículo ID: {} a {}", id, newStatus);
 
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehículo no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(vehiculoNoEncontrado+ id));
 
         VehicleStatus oldStatus = vehicle.getStatus();
         vehicle.setStatus(newStatus);

@@ -34,6 +34,14 @@ public class VehicleFrontendController {
 
 		private static final String logregex = "[\n\r]"; 
 
+		private static final String errorString = "error"; 
+
+		private static final String message = "message"; 
+
+		private static final String internalError = "INTERNAL_ERROR"; 
+
+		private static final String errorInternoServidor = "Error interno del servidor"; 
+
     @Autowired
     private VehicleService vehicleService;
 
@@ -121,8 +129,8 @@ public class VehicleFrontendController {
             
             logger.warn("Frontend - Errores de validación al crear vehículo: {}", errorMessage);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "VALIDATION_ERROR",
-                "message", "Datos de entrada inválidos: " + errorMessage
+                errorString, "VALIDATION_ERROR",
+                message, "Datos de entrada inválidos: " + errorMessage
             ));
         }
 
@@ -156,8 +164,8 @@ public class VehicleFrontendController {
         } catch (Exception e) {
             logger.error("Frontend - Error al crear vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", "Error interno del servidor"
+                errorString, internalError,
+                message, errorInternoServidor
             ));
         }
     }
@@ -185,8 +193,8 @@ public class VehicleFrontendController {
             
             logger.warn("Frontend - Errores de validación al actualizar vehículo: {}", errorMessage);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "VALIDATION_ERROR",
-                "message", "Datos de entrada inválidos: " + errorMessage
+                errorString, "VALIDATION_ERROR",
+                message, "Datos de entrada inválidos: " + errorMessage
             ));
         }
 
@@ -221,14 +229,14 @@ public class VehicleFrontendController {
         } catch (NumberFormatException e) {
             logger.warn("Frontend - ID de vehículo inválido: {}", id);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "INVALID_ID",
-                "message", "ID de vehículo inválido"
+                errorString, "INVALID_ID",
+                message, "ID de vehículo inválido"
             ));
         } catch (Exception e) {
             logger.error("Frontend - Error al actualizar vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", "Error interno del servidor"
+                errorString, internalError,
+                message, errorInternoServidor
             ));
         }
     }
@@ -253,20 +261,20 @@ public class VehicleFrontendController {
             logger.info("Frontend - Vehículo eliminado exitosamente: ID={}", vehicleId);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Vehículo eliminado exitosamente"
+                message, "Vehículo eliminado exitosamente"
             ));
             
         } catch (NumberFormatException e) {
             logger.warn("Frontend - ID de vehículo inválido: {}", id);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "INVALID_ID",
-                "message", "ID de vehículo inválido"
+                errorString, "INVALID_ID",
+                message, "ID de vehículo inválido"
             ));
         } catch (Exception e) {
             logger.error("Frontend - Error al eliminar vehículo: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", "Error interno del servidor"
+                errorString, internalError,
+                message, errorInternoServidor
             ));
         }
     }

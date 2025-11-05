@@ -18,6 +18,12 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class TestController {
 
+		private static final String message = "message";
+
+		private static final String errorString = "error";
+
+		private static final String usernameString = "username";
+
     @Autowired
     private UserRepository userRepository;
     
@@ -50,7 +56,7 @@ public class TestController {
             unlockUser("operador", "operador123", "USER");
             
             return ResponseEntity.ok(Map.of(
-                "message", "Usuarios desbloqueados y reinicializados",
+                message, "Usuarios desbloqueados y reinicializados",
                 "users", Map.of(
                     "admin", "admin123 (ADMIN role)",
                     "operador", "operador123 (USER role)"
@@ -59,8 +65,8 @@ public class TestController {
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
-                "error", "Error al desbloquear usuarios",
-                "message", e.getMessage()
+                errorString, "Error al desbloquear usuarios",
+                message, e.getMessage()
             ));
         }
     }
@@ -70,14 +76,14 @@ public class TestController {
      */
     @PostMapping("/verify-password")
     public ResponseEntity<?> verifyPassword(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
+        String username = request.get(usernameString);
         String password = request.get("password");
         
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
             return ResponseEntity.ok(Map.of(
                 "found", false,
-                "message", "Usuario no encontrado"
+                message, "Usuario no encontrado"
             ));
         }
         
@@ -86,7 +92,7 @@ public class TestController {
         
         return ResponseEntity.ok(Map.of(
             "found", true,
-            "username", username,
+            usernameString, username,
             "passwordMatches", matches,
             "enabled", user.isEnabled(),
             "failedAttempts", user.getFailedAttempts(),
@@ -101,14 +107,14 @@ public class TestController {
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request) {
         try {
-            String username = request.get("username");
+            String username = request.get(usernameString);
             String newPassword = request.get("password");
             
             Optional<User> userOpt = userRepository.findByUsername(username);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Usuario no encontrado",
-                    "message", "El usuario " + username + " no existe"
+                    errorString, "Usuario no encontrado",
+                    message, "El usuario " + username + " no existe"
                 ));
             }
             
@@ -121,15 +127,15 @@ public class TestController {
             userRepository.save(user);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Contraseña actualizada exitosamente",
-                "username", username,
+                message, "Contraseña actualizada exitosamente",
+                usernameString, username,
                 "newPassword", newPassword
             ));
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
-                "error", "Error al cambiar contraseña",
-                "message", e.getMessage()
+                errorString, "Error al cambiar contraseña",
+                message, e.getMessage()
             ));
         }
     }

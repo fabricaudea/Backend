@@ -17,6 +17,8 @@ public class AuthenticationEventListener {
     
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationEventListener.class);
 
+		private static final String unknown = "unknown";
+
     private AuthenticationService authenticationService;
 
 		@Autowired
@@ -48,19 +50,19 @@ public class AuthenticationEventListener {
             HttpServletRequest request = attr.getRequest();
             
             String xForwardedFor = request.getHeader("X-Forwarded-For");
-            if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            if (xForwardedFor != null && !xForwardedFor.isEmpty() && !unknown.equalsIgnoreCase(xForwardedFor)) {
                 return xForwardedFor.split(",")[0].trim();
             }
             
             String xRealIP = request.getHeader("X-Real-IP");
-            if (xRealIP != null && !xRealIP.isEmpty() && !"unknown".equalsIgnoreCase(xRealIP)) {
+            if (xRealIP != null && !xRealIP.isEmpty() && !unknown.equalsIgnoreCase(xRealIP)) {
                 return xRealIP;
             }
             
             return request.getRemoteAddr();
         } catch (Exception e) {
             logger.error("Error obteniendo IP del cliente: {}", e.getMessage());
-            return "unknown";
+            return unknown;
         }
     }
 }
