@@ -81,9 +81,7 @@ public class VehicleController {
             return ResponseEntity.status(HttpStatus.CREATED).body(vehicleResponse);
             
         } catch (Exception e) {
-            logger.error("Error al crear vehículo: {}", e.getMessage());
-            // Las excepciones específicas son manejadas por GlobalExceptionHandler
-            throw e;
+            throw new RuntimeException("Error al crear vehículo", e);
         }
     }
 
@@ -175,7 +173,7 @@ public class VehicleController {
             return ResponseEntity.ok(vehicleResponse);
             
         } catch (Exception e) {
-            logger.error("Error al actualizar vehículo ID {}: {}", id, e.getMessage());
+            logger.error("Error al actualizar vehículo ID {}: {}", id, e);
             // Las excepciones específicas son manejadas por GlobalExceptionHandler
             throw e;
         }
@@ -204,7 +202,7 @@ public class VehicleController {
             ));
             
         } catch (Exception e) {
-            logger.error("Error al eliminar vehículo ID {}: {}", id, e.getMessage());
+            logger.error("Error al eliminar vehículo ID {}: {}", id, e);
             // Las excepciones específicas son manejadas por GlobalExceptionHandler
             throw e;
         }

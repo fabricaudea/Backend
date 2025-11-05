@@ -28,9 +28,9 @@ public class PasswordHashGenerator {
         
         for (String password : passwords) {
             String hash = encoder.encode(password);
-            logger.info("Contraseña: " + password);
-            logger.info("Hash BCrypt: " + hash);
-            logger.info("Verificación: " + encoder.matches(password, hash));
+            logger.info("Contraseña: {}", password);
+            logger.info("Hash BCrypt: {}", hash);
+            logger.info("Verificación: {}", encoder.matches(password, hash));
             logger.info("-".repeat(80));
         }
     }

@@ -72,7 +72,7 @@ public class VehicleFrontendController {
                     vehicle.setUpdatedAt(vehicleResponse.getUpdatedAt());
                     return VehicleResponseFrontend.from(vehicle);
                 })
-                .collect(Collectors.toList());
+                .toList();
         
         logger.debug("Frontend - Retornando {} vehículos", vehicles.size());
         return ResponseEntity.ok(vehicles);

@@ -123,7 +123,7 @@ public class VehicleService {
         List<Vehicle> vehicles = vehicleRepository.findActiveVehicles();
         return vehicles.stream()
                 .map(VehicleResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -139,7 +139,7 @@ public class VehicleService {
         List<Vehicle> vehicles = vehicleRepository.findByStatus(status);
         return vehicles.stream()
                 .map(VehicleResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -154,7 +154,7 @@ public class VehicleService {
         List<Vehicle> vehicles = vehicleRepository.findAvailableVehicles();
         return vehicles.stream()
                 .map(VehicleResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
