@@ -5,6 +5,7 @@ import com.fleetguard360.monitoring_service.model.Role;
 import com.fleetguard360.monitoring_service.repository.UserRepository;
 import com.fleetguard360.monitoring_service.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/test")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Profile("!demo")
 public class TestController {
 
     @Autowired

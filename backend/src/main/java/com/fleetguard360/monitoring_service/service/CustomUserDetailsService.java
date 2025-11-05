@@ -3,6 +3,7 @@ package com.fleetguard360.monitoring_service.service;
 import com.fleetguard360.monitoring_service.model.User;
 import com.fleetguard360.monitoring_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Profile("!demo")
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
