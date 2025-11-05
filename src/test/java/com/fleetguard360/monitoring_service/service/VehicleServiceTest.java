@@ -6,7 +6,6 @@ import com.fleetguard360.monitoring_service.dto.VehicleResponse;
 import com.fleetguard360.monitoring_service.exception.BusinessException;
 import com.fleetguard360.monitoring_service.exception.DuplicateResourceException;
 import com.fleetguard360.monitoring_service.exception.ResourceNotFoundException;
-import com.fleetguard360.monitoring_service.model.FuelType;
 import com.fleetguard360.monitoring_service.model.Vehicle;
 import com.fleetguard360.monitoring_service.model.VehicleStatus;
 import com.fleetguard360.monitoring_service.repository.VehicleRepository;

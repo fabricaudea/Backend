@@ -14,10 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -41,22 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Se utiliza @WithMockUser para simular la autenticación y autorización.
  */
 @WebMvcTest(VehicleController.class)
-// IMPORTANTE: Importamos el GlobalExceptionHandler.
-// Asumo que se llama así y está en este paquete. Ajusta la ruta si es necesario.
 
-// ¡¡¡ATENCIÓN!!!: Los 3 errores 500 (en delete, getById y update) 
-// confirman que esta ruta de importación es INCORRECTA.
-// Por favor, busca tu clase con @ControllerAdvice (seguramente se llama GlobalExceptionHandler)
-// y corrige esta línea con la ruta completa (ej: com.fleetguard360.monitoring_service.handler.MiHandler.class)
-
-// ================== ¡¡¡ACCIÓN REQUERIDA!!! ==================
-// REEMPLAZA la siguiente línea con la RUTA REAL de tu clase @ControllerAdvice
 @Import({SecurityConfig.class, com.fleetguard360.monitoring_service.exception.GlobalExceptionHandler.class})
-// 
-// Ejemplo: Si tu clase se llama 'RestExceptionHandler' y está en el paquete 'com.fleetguard360.monitoring_service.handler',
-// la línea correcta sería:
-// @Import({SecurityConfig.class, com.fleetguard360.monitoring_service.handler.RestExceptionHandler.class})
-// ==========================================================
 
 public class VehicleControllerTest {
 
@@ -66,10 +52,10 @@ public class VehicleControllerTest {
     @Autowired
     private ObjectMapper objectMapper; // Para convertir objetos a JSON y viceversa
 
-    @MockBean
+    @MockitoBean
     private VehicleService vehicleService; // Simulación del servicio
 
-    @MockBean
+    @MockitoBean
     private CustomUserDetailsService userDetailsService; // Dependencia de SecurityConfig
 
     private VehicleResponse vehicleResponse;
@@ -143,27 +129,6 @@ public class VehicleControllerTest {
     @Test
     @WithMockUser(roles = "USER") // Probamos con rol USER
     void whenCreateVehicle_withUserRole_shouldReturnForbidden() throws Exception {
-        // El @PreAuthorize("hasRole('ADMIN')") en el controlador (aunque comentado)
-        // si se activa, este test fallará con 403 Forbidden.
-        // Si se deja sin @PreAuthorize, este test debería funcionar.
-        // Lo escribo asumiendo que el @PreAuthorize("hasRole('ADMIN')") se descomentará.
-        
-        // Arrange
-        // when(vehicleService.createVehicle(any(CreateVehicleRequest.class))).thenReturn(vehicleResponse);
-
-        // Act & Assert
-        // mockMvc.perform(post("/api/vehicles")
-        //                 .contentType(MediaType.APPLICATION_JSON)
-        //                 .content(objectMapper.writeValueAsString(createRequest)))
-        //         .andExpect(status().isForbidden());
-        
-        // Nota: Si el @PreAuthorize("hasRole('ADMIN')") está comentado,
-        // la anotación @PreAuthorize del método superior no aplica a POST.
-        // La regla general en SecurityConfig es .requestMatchers("/api/vehicles/**").hasAnyRole("ADMIN", "USER")
-        // PERO @PostMapping no tiene @PreAuthorize, por lo que este test fallaría.
-        // El controlador necesita @PreAuthorize("hasRole('ADMIN')") en createVehicle para que sea seguro.
-        // Asumiendo que SÍ lo tiene (como en PUT y DELETE), el test de arriba es correcto.
-        // Si NO lo tiene, el test de abajo es el correcto:
         
         when(vehicleService.createVehicle(any(CreateVehicleRequest.class))).thenReturn(vehicleResponse);
         mockMvc.perform(post("/api/vehicles")
@@ -178,7 +143,6 @@ public class VehicleControllerTest {
         mockMvc.perform(post("/api/vehicles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
-                // FIX: La configuración de seguridad devuelve 403 (Forbidden) por defecto, no 401
                 .andExpect(status().isForbidden());
     }
 
@@ -225,13 +189,6 @@ public class VehicleControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void whenGetVehicleById_withInvalidId_shouldReturnNotFound() throws Exception {
-        // Arrange
-        // Asumimos que el servicio lanza una excepción (p.ej. RuntimeException o una personalizada)
-        // y que un @ControllerAdvice (GlobalExceptionHandler) la maneja y retorna 404.
-        
-        // FIX: Lanzamos la excepción específica (ResourceNotFoundException)
-        // que tu GlobalExceptionHandler SÍ sabe manejar y convertir a 404.
-        // Lanzar RuntimeException genérica causaba que el handler de Exception (500) la tomara.
         when(vehicleService.getVehicleById(99L)).thenThrow(new ResourceNotFoundException("Vehicle not found with ID: 99"));
 
         // Act & Assert
@@ -337,9 +294,6 @@ public class VehicleControllerTest {
         // FIX: Hacemos el mock más específico para el enum
         when(vehicleService.getVehiclesByStatus(eq(status))).thenReturn(List.of(vehicleResponse));
 
-        // Act & Assert
-        // FIX: Debemos pasar el *nombre* del enum ("AVAILABLE") como string en la URL,
-        // no el objeto 'status' (que su .toString() es "Disponible" y eso falla la conversión)
         mockMvc.perform(get("/api/vehicles/status/{status}", "AVAILABLE")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
