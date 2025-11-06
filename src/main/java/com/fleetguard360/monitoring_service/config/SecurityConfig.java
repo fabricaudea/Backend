@@ -66,7 +66,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Endpoints públicos - no requieren autenticación
                 .requestMatchers("/api/auth/login", "/api/frontend/auth/login", 
-                               "/api/health/**", "/api/test/**", "/index.html", "/map/**", "/css/**", "/js/**", "/images/**").permitAll()
+                               "/api/health/**", "/api/test/**", "/index.html", "/map/**", "/css/**", "/js/**", "/images/**", "swagger-ui/**", "/v3/api-docs/**").permitAll()
                 // Endpoints específicos del frontend
                 .requestMatchers("/api/frontend/auth/me").authenticated()
                 .requestMatchers("/api/frontend/auth/logout").authenticated()
