@@ -47,7 +47,7 @@ public class VehicleController {
      * 3. El vehículo debe aparecer en la lista después de registrarse
      */
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createVehicle(
             @Valid @RequestBody CreateVehicleRequest request,
             BindingResult bindingResult) {
