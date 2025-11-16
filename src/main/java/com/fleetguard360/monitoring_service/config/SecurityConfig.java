@@ -57,35 +57,39 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) // Para APIs REST, deshabilitar CSRF
-            .authorizeHttpRequests(authz -> authz
-                // Endpoints públicos - no requieren autenticación
-                .requestMatchers("/api/auth/login", "/api/frontend/auth/login", 
-                               "/api/health/**", "/api/test/**", "/index.html", "/map/**", "/css/**", "/js/**", "/images/**", "swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // Endpoints específicos del frontend
-                .requestMatchers("/api/frontend/auth/me").authenticated()
-                .requestMatchers("/api/frontend/auth/logout").authenticated()
-                .requestMatchers("/api/frontend/vehicles/**").hasAnyRole(ADMIN, USER)
-                // Endpoints originales de vehículos - requieren autenticación con roles específicos
-                .requestMatchers("/api/vehicles/**").hasAnyRole(ADMIN, USER)
-                // Endpoints que requieren roles específicos
-                .requestMatchers("/api/admin/**").hasRole(ADMIN)
-                .requestMatchers("/api/user/**").hasAnyRole(USER, ADMIN)
-                // Endpoint de logout requiere autenticación
-                .requestMatchers("/api/auth/logout", "/api/auth/status").authenticated()
-                // Todos los demás requieren autenticación
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session
-                .maximumSessions(1) // Máximo una sesión por usuario
-                .maxSessionsPreventsLogin(false) // Permitir nueva sesión, expulsar la anterior
-            );
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ AGREGADO: Sesiones stateless para JWT
+                )
+                .authorizeHttpRequests(authz -> authz
+                        // Endpoints públicos - no requieren autenticación
+                        .requestMatchers("/api/auth/login", "/api/frontend/auth/login",
+                                "/api/health/**", "/api/test/**",
+                                "/index.html", "/map/**", "/css/**", "/js/**", "/images/**",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll() // ✅ CORREGIDO: /swagger-ui/**
+                        // Endpoints específicos del frontend
+                        .requestMatchers("/api/frontend/auth/me").authenticated()
+                        .requestMatchers("/api/frontend/auth/logout").authenticated()
+                        .requestMatchers("/api/frontend/vehicles/**").hasAnyRole(ADMIN, USER)
+                        // Endpoints originales de vehículos
+                        .requestMatchers("/api/vehicles/**").hasAnyRole(ADMIN, USER)
+                        // Endpoints que requieren roles específicos
+                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
+                        .requestMatchers("/api/user/**").hasAnyRole(USER, ADMIN)
+                        // Endpoint de logout requiere autenticación
+                        .requestMatchers("/api/auth/logout", "/api/auth/status").authenticated()
+                        // Todos los demás requieren autenticación
+                        .anyRequest().authenticated()
+                );
+        // ✅ AGREGADO: Filtro JWT (veremos si lo tienes o lo creamos)
+        // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
 }
