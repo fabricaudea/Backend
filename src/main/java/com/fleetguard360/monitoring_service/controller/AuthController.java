@@ -43,15 +43,15 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    
+
     private AuthenticationManager authenticationManager;
-    
+
     private AuthenticationService authenticationService;
-    
+
     private CustomUserDetailsService userDetailsService;
 
 		@Autowired
@@ -60,11 +60,11 @@ public class AuthController {
 			this.authenticationService = authenticationService;
 			this.userDetailsService = userDetailsService;
 		}
-    
+
     /**
      * Endpoint para autenticación de usuarios
      * POST /api/auth/login
-     * 
+     *
      * @param loginRequest Datos de login (username, password)
      * @param bindingResult Resultado de la validación
      * @param request HTTP request para obtener IP
@@ -75,26 +75,26 @@ public class AuthController {
             @Valid @RequestBody LoginRequest loginRequest,
             BindingResult bindingResult,
             HttpServletRequest request) {
-        
+
         // Validar errores de entrada
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage())
                     .collect(Collectors.joining(", "));
-            
+
             logger.warn("Errores de validación en login: {}", errorMessage);
             return ResponseEntity.badRequest()
                     .body(LoginResponse.failure("Datos de entrada inválidos: " + errorMessage));
         }
 
 				String username = authenticationService.prepareUsername(loginRequest.getUsername(), "API");
-        
+
         String password = loginRequest.getPassword();
         String clientIp = getClientIpAddress(request);
 				if (clientIp != null) {
 					clientIp = clientIp.replaceAll("[\n\r]", "_");
 				}
-        
+
         try {
             // Verificar si la cuenta está bloqueada
             if (authenticationService.isAccountLocked(username)) {
@@ -102,76 +102,76 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.LOCKED)
                         .body(LoginResponse.failure("Cuenta bloqueada por múltiples intentos fallidos. Intente más tarde."));
             }
-            
+
             // Realizar autenticación
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            
+
             // Si la autenticación es exitosa, establecer el contexto de seguridad
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
+
             // Crear sesión HTTP
             HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                                 SecurityContextHolder.getContext());
-            
+
             // Resetear intentos fallidos
             authenticationService.resetFailedAttempts(username);
-            
+
             // Obtener información del usuario autenticado
             User user = userDetailsService.loadUserEntityByUsername(username);
             var roles = user.getRoles().stream()
                     .map(Role::getName)
                     .collect(Collectors.toSet());
-            
+
             logger.info("Login exitoso para usuario: {} desde IP: {}", username, clientIp);
-            
+
             return ResponseEntity.ok(LoginResponse.success(username, roles));
-            
+
         } catch (LockedException e) {
             logger.warn("Cuenta bloqueada durante autenticación: {} desde IP: {}", username, clientIp);
             return ResponseEntity.status(HttpStatus.LOCKED)
                     .body(LoginResponse.failure("Cuenta bloqueada temporalmente"));
-                    
+
         } catch (DisabledException e) {
             logger.warn("Cuenta deshabilitada: {} desde IP: {}", username, clientIp);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(LoginResponse.failure("Cuenta deshabilitada"));
-                    
+
         } catch (BadCredentialsException e) {
             logger.warn("Credenciales inválidas para usuario: {} desde IP: {}", username, clientIp);
-            
+
             // Incrementar intentos fallidos
             authenticationService.recordFailedAttempt(username, clientIp);
-            
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(LoginResponse.failure("Usuario o contraseña incorrectos"));
-                    
+
         } catch (AuthenticationException e) {
-            logger.error("Error de autenticación para usuario: {} desde IP: {}, Error: {}", 
+            logger.error("Error de autenticación para usuario: {} desde IP: {}, Error: {}",
                         username, clientIp, e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(LoginResponse.failure("Error de autenticación"));
         }
     }
-    
+
     /**
      * Endpoint para cerrar sesión
      * POST /api/auth/logout
-     * 
+     *
      * @param request HTTP request
      * @return ResponseEntity con LogoutResponse
      */
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
-        
+
         String username = getCurrentUsername();
         String clientIp = getClientIpAddress(request);
-        
+
         logger.info("Logout solicitado por usuario: {} desde IP: {}", username, clientIp);
-        
+
         try {
             // Invalidar la sesión HTTP
             HttpSession session = request.getSession(false);
@@ -179,64 +179,64 @@ public class AuthController {
                 session.invalidate();
                 logger.debug("Sesión HTTP invalidada para usuario: {}", username);
             }
-            
+
             // Limpiar el contexto de seguridad
             SecurityContextHolder.clearContext();
-            
+
             logger.info("Logout exitoso para usuario: {} desde IP: {}", username, clientIp);
-            
+
             return ResponseEntity.ok(LogoutResponse.success(username));
-            
+
         } catch (Exception e) {
-            logger.error("Error durante logout para usuario: {} desde IP: {}, Error: {}", 
+            logger.error("Error durante logout para usuario: {} desde IP: {}, Error: {}",
                         username, clientIp, e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(LogoutResponse.failure("Error durante el logout"));
         }
     }
-    
+
     /**
      * Endpoint para verificar el estado de autenticación
      * GET /api/auth/status
-     * 
+     *
      * @return ResponseEntity con información del usuario actual
      */
     @GetMapping("/status")
     public ResponseEntity<?> getAuthStatus() {
-        
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication != null && authentication.isAuthenticated() 
+
+        if (authentication != null && authentication.isAuthenticated()
                 && !authentication.getName().equals("anonymousUser")) {
-            
+
             String username = authentication.getName();
             var authorities = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toSet());
-            
+
             return ResponseEntity.ok(LoginResponse.success(username, authorities));
         }
-        
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(LoginResponse.failure("Usuario no autenticado"));
     }
-    
+
     /**
      * Obtiene el nombre de usuario actual del contexto de seguridad
-     * 
+     *
      * @return username o "anonymous" si no está autenticado
      */
     private String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (authentication != null && authentication.isAuthenticated()) 
-                ? authentication.getName() 
+        return (authentication != null && authentication.isAuthenticated())
+                ? authentication.getName()
                 : "anonymous";
     }
-    
+
     /**
      * Obtiene la dirección IP del cliente desde el HTTP request
-     * 
+     *
      * @param request HTTP request
      * @return dirección IP del cliente
      */
@@ -245,12 +245,12 @@ public class AuthController {
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();
         }
-        
+
         String xRealIp = request.getHeader("X-Real-IP");
         if (xRealIp != null && !xRealIp.isEmpty()) {
             return xRealIp;
         }
-        
+
         return request.getRemoteAddr();
     }
 }

@@ -1,170 +1,114 @@
 package com.fleetguard360.monitoring_service.controller;
 
 import com.fleetguard360.monitoring_service.model.User;
-import com.fleetguard360.monitoring_service.model.Role;
-import com.fleetguard360.monitoring_service.repository.UserRepository;
-import com.fleetguard360.monitoring_service.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.fleetguard360.monitoring_service.service.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/test")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class TestController {
 
-		private static final String MESSAGE = "message";
+    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
-		private static final String ERROR_STRING = "error";
+    private final CustomUserDetailsService userDetailsService;
 
-		private static final String USERNAME_STRING = "username";
-
-    private UserRepository userRepository;
-    
-    private RoleRepository roleRepository;
-    
-    private PasswordEncoder passwordEncoder;
-
-		@Autowired
-		public TestController ( UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-			this.userRepository = userRepository;
-			this.roleRepository = roleRepository;
-			this.passwordEncoder = passwordEncoder;
-		}
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public TestController(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
-    @GetMapping("/roles")
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
-    }
-    
     /**
-     * Endpoint para desbloquear y reinicializar usuarios de prueba
+     * Endpoint completamente público.
+     * No requiere token.
      */
-    @PostMapping("/unlock-users")
-    public ResponseEntity<?> unlockUsers() {
-        try {
-            // Desbloquear usuario admin
-            unlockUser("admin", "admin123", "ADMIN");
-            
-            // Desbloquear usuario operador con contraseña más larga
-            unlockUser("operador", "operador123", "USER");
-            
-            return ResponseEntity.ok(Map.of(
-                MESSAGE, "Usuarios desbloqueados y reinicializados",
-                "users", Map.of(
-                    "admin", "admin123 (ADMIN role)",
-                    "operador", "operador123 (USER role)"
+    @GetMapping("/public")
+    public ResponseEntity<?> publicEndpoint() {
+        return ResponseEntity.ok(
+                Map.of(
+                        "endpoint", "/api/test/public",
+                        "message", "Acceso público sin autenticación",
+                        "status", "OK"
                 )
-            ));
-            
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of(
-                ERROR_STRING, "Error al desbloquear usuarios",
-                MESSAGE, e.getMessage()
-            ));
-        }
+        );
     }
-    
+
     /**
-     * Endpoint para verificar si las contraseñas coinciden
+     * Endpoint que muestra información básica del contexto de seguridad.
+     * No exige rol específico, pero solo tendrá usuario si se envía token.
      */
-    @PostMapping("/verify-password")
-    public ResponseEntity<?> verifyPassword(@RequestBody Map<String, String> request) {
-        String username = request.get(USERNAME_STRING);
-        String password = request.get("password");
-        
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.ok(Map.of(
-                "found", false,
-                MESSAGE, "Usuario no encontrado"
-            ));
+    @GetMapping("/whoami")
+    public ResponseEntity<?> whoAmI() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.ok(
+                    Map.of(
+                            "authenticated", false,
+                            "message", "No hay usuario autenticado (o no se envió token)"
+                    )
+            );
         }
-        
-        User user = userOpt.get();
-        boolean matches = passwordEncoder.matches(password, user.getPassword());
-        
-        return ResponseEntity.ok(Map.of(
-            "found", true,
-            USERNAME_STRING, username,
-            "passwordMatches", matches,
-            "enabled", user.isEnabled(),
-            "failedAttempts", user.getFailedAttempts(),
-            "lockTime", user.getLockTime(),
-            "roles", user.getRoles().stream().map(Role::getName).toList()
-        ));
+
+        String username = authentication.getName();
+        User user = userDetailsService.loadUserEntityByUsername(username);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "authenticated", true,
+                        "username", username,
+                        "roles", authentication.getAuthorities()
+                       // "fullName", user.getFullName()
+                )
+        );
     }
-    
+
     /**
-     * Endpoint para cambiar contraseña de un usuario específico
+     * Solo accesible para usuarios con rol USER o ADMIN.
+     * Requiere token JWT válido.
      */
-    @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request) {
-        try {
-            String username = request.get(USERNAME_STRING);
-            String newPassword = request.get("password");
-            
-            Optional<User> userOpt = userRepository.findByUsername(username);
-            if (userOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    ERROR_STRING, "Usuario no encontrado",
-                    MESSAGE, "El usuario " + username + " no existe"
-                ));
-            }
-            
-            User user = userOpt.get();
-            user.setPassword(passwordEncoder.encode(newPassword));
-            user.setFailedAttempts(0);
-            user.setLockTime(null);
-            user.setEnabled(true);
-            
-            userRepository.save(user);
-            
-            return ResponseEntity.ok(Map.of(
-                MESSAGE, "Contraseña actualizada exitosamente",
-                USERNAME_STRING, username,
-                "newPassword", newPassword
-            ));
-            
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of(
-                ERROR_STRING, "Error al cambiar contraseña",
-                MESSAGE, e.getMessage()
-            ));
-        }
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/user")
+    public ResponseEntity<?> userEndpoint() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "desconocido";
+
+        logger.info("Acceso a /api/test/user por {}", username);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "endpoint", "/api/test/user",
+                        "message", "Acceso permitido a usuario con rol USER o ADMIN",
+                        "username", username
+                )
+        );
     }
-    
-    private void unlockUser(String username, String password, String roleName) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            
-            // Desbloquear cuenta
-            user.setFailedAttempts(0);
-            user.setLockTime(null);
-            user.setEnabled(true);
-            
-            // Actualizar contraseña
-            user.setPassword(passwordEncoder.encode(password));
-            
-            // Asegurar que tiene el rol correcto
-            user.getRoles().clear();
-            Optional<Role> role = roleRepository.findByName(roleName);
-            if (role.isPresent()) {
-                user.getRoles().add(role.get());
-            }
-            
-            userRepository.save(user);
-        }
+
+    /**
+     * Solo accesible para usuarios con rol ADMIN.
+     * Requiere token JWT válido.
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public ResponseEntity<?> adminEndpoint() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "desconocido";
+
+        logger.info("Acceso a /api/test/admin por {}", username);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "endpoint", "/api/test/admin",
+                        "message", "Acceso permitido solo a ADMIN",
+                        "username", username
+                )
+        );
     }
 }
