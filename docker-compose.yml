@@ -1,38 +1,26 @@
-version: '3.8'
-services:
-  mysql-db:
-    image: mysql:8
-    container_name: mysql-db
-    environment:
-      MYSQL_DATABASE: fleetguard360
-      MYSQL_USER: user
-      MYSQL_PASSWORD: user
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3308:3306"  # Expone el puerto si quieres acceder desde fuera del contenedor
-    volumes:
-      - db-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
+version: '3.9'
 
-  backend:
-    build: .
-    container_name: spring-backend
+services:
+  fleetguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fleetguard-api
     ports:
       - "8080:8080"
     environment:
-      environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/fleetguard360?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: user
-    depends_on:
-      mysql-db:
-        condition: service_healthy
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-volumes:
-  db-data:
+  # Opcional: Agregador de logs
+  # logs:
+  #   image: busybox
+  #   volumes:
+  #     - ./logs:/var/log/app
+  #   command: tail -f /var/log/app/app.log

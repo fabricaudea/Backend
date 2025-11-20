@@ -36,7 +36,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fleetguard360.monitoring_service.config.SecurityConfig;
-import com.fleetguard360.monitoring_service.dto.LoginRequest;
 import com.fleetguard360.monitoring_service.model.Role;
 import com.fleetguard360.monitoring_service.model.User;
 import com.fleetguard360.monitoring_service.service.AuthenticationService;
