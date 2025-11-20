@@ -1,55 +1,36 @@
 package com.fleetguard360.monitoring_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+
+import java.time.LocalDateTime;
+
+/**
+ * Controlador de Salud - Verifica el estado del servicio
+ */
 @RestController
 @RequestMapping("/api/health")
+@Tag(name = "Health", description = "Endpoint de salud del servicio")
 public class HealthController {
 
-    private DataSource dataSource;
-
-		private static final String STATUS = "status";
-
-		private static final String MESSAGE = "message";
-
-		@Autowired
-		public HealthController ( DataSource dataSource) {
-			this.dataSource = dataSource;
-		}
-
-    @GetMapping("/db")
-    public Map<String, Object> checkDatabaseConnection() {
+    @GetMapping
+    @Operation(summary = "Verificar estado del servicio")
+    public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
-        
-        try (Connection connection = dataSource.getConnection()) {
-            response.put(STATUS, "UP");
-            response.put("database", connection.getMetaData().getDatabaseProductName());
-            response.put("version", connection.getMetaData().getDatabaseProductVersion());
-            response.put("url", connection.getMetaData().getURL());
-            response.put(MESSAGE, "Database connection successful");
-        } catch (Exception e) {
-            response.put(STATUS, "DOWN");
-            response.put("error", e.getMessage());
-            response.put(MESSAGE, "Database connection failed");
-        }
-        
-        return response;
-    }
+        response.put("status", "UP");
+        response.put("service", "FleetGuard360 - Monitoring Service");
+        response.put("timestamp", LocalDateTime.now());
+        response.put("version", "0.0.1-SNAPSHOT");
 
-    @GetMapping("/app")
-    public Map<String, String> checkApplication() {
-        Map<String, String> response = new HashMap<>();
-        response.put(STATUS, "UP");
-        response.put("application", "FleetGuard360 Monitoring Service");
-        response.put(MESSAGE, "Application is running");
-        return response;
+        return ResponseEntity.ok(response);
     }
 }
